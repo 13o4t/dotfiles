@@ -11,31 +11,21 @@ function rootness {
 }
 
 function apt_conf {
-    apt-get clean
-    apt-get autoclean
     apt-get update
     apt-get -y upgrade
-    apt-get -y dist-upgrade
 }
 
 function beautify_conf {
-    # clean software
-    apt-get remove unity-webapps-common
-    apt-get remove thunderbird totem rhythmbox empathy brasero simple-scan
-    apt-get remove gnome-mahjongg aisleriot gnome-mines cheese
-    apt-get remove transmission-common gnome-orca webbrowser-app gnome-sudoku
-    apt-get remove landscape-client-ui-install onboard deja-dup
-
     # install theme
-    apt-get install unity-tweak-tool
-    add-apt-repository ppa:noobslab/themes
+    apt-get -y install unity-tweak-tool
+    add-apt-repository -y ppa:noobslab/themes
     apt-get update
-    apt-get install flatabulous-theme
+    apt-get -y install flatabulous-theme
 
     # install icon
-    add-apt-repository ppa:numix/ppa
+    add-apt-repository -y ppa:numix/ppa
     apt-get update
-    apt-get install numix-icon-theme-circle
+    apt-get -y install numix-icon-theme-circle
 }
 
 function git_conf {
@@ -44,20 +34,24 @@ function git_conf {
     git_filename = `find $dir -name "gitconfig"`
     if [ -z git_filename ]
     then
-        wget https://github.com/m75n/my-ubuntu-config/blob/master/conf/gitconfig -P $dir/conf
+        wget \
+        https://raw.githubusercontent.com/m75n/my-ubuntu-config/master/conf/gitconfig \
+        -P $dir/conf
     fi
     cp $dir/conf/gitconfig ~/.gitconfig
 }
 
 function vim_conf {
-    apt-get -y install curl wget
+    apt-get -y install vim curl wget
     curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
             https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
     vim_filename = `find $dir -name "vimrc"`
     if [ -z vim_filename ]
     then
-        wget https://github.com/m75n/my-ubuntu-config/blob/master/conf/vimrc -P $dir/conf
+        wget \
+        https://raw.githubusercontent.com/m75n/my-ubuntu-config/master/conf/vimrc \
+        -P $dir/conf
     fi
     cp $dir/conf/vimrc ~/.vimrc
 }
@@ -68,22 +62,25 @@ function tmux_conf {
     tmux_filename = `find $dir -name "tmux.conf"`
     if [ -z tmux_filename ]
     then
-        wget https://github.com/m75n/my-ubuntu-config/blob/master/conf/tmux.conf -P $dir
+        wget \
+        https://raw.githubusercontent.com/m75n/my-ubuntu-config/master/conf/tmux.conf \
+        -P $dir/conf
     fi
-    cp $dir/tmux.conf ~/.tmux.conf
+    cp $dir/conf/tmux.conf ~/.tmux.conf
 }
 
 # typewriting
 function sogou_conf {
     apt-get -y install wget
-    wget http://pinyin.sogou.com/linux/download.php?f=linux&bit=64 -P $dir
-    sogou_filename = `find $dir -name "sogou*.deb"`
-    dpkg -i sogou_filename
+    wget 'http://pinyin.sogou.com/linux/download.php?f=linux&bit=64' -O \
+    $dir/sogoupinyin.deb
+    dpkg -i sogoupinyin.deb
 }
 
 function zsh_conf {
     apt-get -y install zsh wget
     chsh -s /bin/zsh
+    # a little bug
     sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
 }
 
@@ -101,8 +98,8 @@ function docker_conf {
 
 # blog
 function hexo_conf {
-    apt-get install nodejs
-    apt-get install npm
+    apt-get -y install nodejs
+    apt-get -y install npm
 
     npm install hexo-cli -g
 }
@@ -111,15 +108,15 @@ function hexo_conf {
 function typora_conf {
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA300B7755AFCFAE
 
-    add-apt-repository 'deb https://typora.io ./linux/'
+    add-apt-repository -y 'deb https://typora.io ./linux/'
     apt-get update
 
     apt-get -y install typora
 }
 
 function leetcode_conf {
-    apt-get install nodejs
-    apt-get install npm
+    apt-get -y install nodejs
+    apt-get -y install npm
 
     npm install leetcode-cli -g
 }
@@ -137,6 +134,7 @@ function print_info {
 Author  : m75n
 Project : https://github.com/m75n/my-ubuntu-config.git
 ============================================================
+
 EOF
 }
 
@@ -144,22 +142,21 @@ function show_help {
     print_info
 
     cat << "EOF"
-
 SYNOPSIS
     my-ubuntu-config.sh [OPTION]
 
 DESCRIPTION
-Default options are --apt --beautify --git --vim --tmux --sogou --zsh --typora
+Default options are --apt --beautify --git --vim --tmux --sogou --typora --zsh
 
     --apt           apt update
-    --beautify      clean system and install theme
+    --beautify      install theme
     --git           install git
     --vim           install vim and vimrc
     --tmux          install tmux and tmux.conf
     --sogou         install sogoupinyin
     --zsh           install zsh and oh-my-zsh
     --docker        install docker
-    --hexo          install hexo
+    --hexo          install hexo (blog framework)
     --typora        install typora (markdown editor)
     --leetcode      install leetcode-cli
 
@@ -182,8 +179,8 @@ then
     vim_conf
     tmux_conf
     sogou_conf
-    zsh_conf
     typora_conf
+    zsh_conf
 
     echo "Please reboot the computer."
 fi
