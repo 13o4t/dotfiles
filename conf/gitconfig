@@ -1,0 +1,7 @@
+[user]
+	email =
+	name =
+[push]
+	default = simple
+[core]
+	editor = vim
