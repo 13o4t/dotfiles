@@ -31,14 +31,14 @@ function beautify_conf {
 function git_conf {
     apt-get -y install git
 
-    git_filename = `find $dir -name "gitconfig"`
-    if [ -z git_filename ]
+    git_filename=`find $dir -name "gitconfig"`
+    if [ -z "$git_filename" ]
     then
         wget \
         https://raw.githubusercontent.com/m75n/my-ubuntu-config/master/conf/gitconfig \
         -P $dir/conf
     fi
-    cp $dir/conf/gitconfig ~/.gitconfig
+    mv $dir/conf/gitconfig ~/.gitconfig
 }
 
 function vim_conf {
@@ -46,48 +46,65 @@ function vim_conf {
     curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
             https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
-    vim_filename = `find $dir -name "vimrc"`
-    if [ -z vim_filename ]
+    vim_filename=`find $dir -name "vimrc"`
+    if [ -z "$vim_filename" ]
     then
         wget \
         https://raw.githubusercontent.com/m75n/my-ubuntu-config/master/conf/vimrc \
         -P $dir/conf
     fi
-    cp $dir/conf/vimrc ~/.vimrc
+    mv $dir/conf/vimrc ~/.vimrc
 }
 
 function tmux_conf {
     apt-get -y install tmux wget
 
-    tmux_filename = `find $dir -name "tmux.conf"`
-    if [ -z tmux_filename ]
+    tmux_filename=`find $dir -name "tmux.conf"`
+    if [ -z "$tmux_filename" ]
     then
         wget \
         https://raw.githubusercontent.com/m75n/my-ubuntu-config/master/conf/tmux.conf \
         -P $dir/conf
     fi
-    cp $dir/conf/tmux.conf ~/.tmux.conf
+    mv $dir/conf/tmux.conf ~/.tmux.conf
 }
 
 # typewriting
 function sogou_conf {
     apt-get -y install wget
-    wget 'http://pinyin.sogou.com/linux/download.php?f=linux&bit=64' -O \
-    $dir/sogoupinyin.deb
-    dpkg -i sogoupinyin.deb
+    bits=`uname --m`
+    if [ "x86_64" = "$bits" ]
+    then
+        wget 'http://pinyin.sogou.com/linux/download.php?f=linux&bit=64' -O \
+        $dir/conf/sogoupinyin.deb
+    else
+        wget 'http://pinyin.sogou.com/linux/download.php?f=linux&bit=32' -O \
+        $dir/conf/sogoupinyin.deb
+    fi
+    dpkg -i conf/sogoupinyin.deb
+
+    rm $dir/conf/sogoupinyin.deb
 }
 
 function zsh_conf {
     apt-get -y install zsh wget
     chsh -s /bin/zsh
-    # a little bug
-    sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
+
+    wget \
+    https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh \
+    -O $dir/conf/oh-my-zsh-install.sh
+
+    sed -i '/env\ zsh/d' $dir/conf/oh-my-zsh-install.sh
+    chmod +x $dir/conf/oh-my-zsh-install.sh
+    sh -c "$dir/conf/oh-my-zsh-install.sh"
+
+    rm $dir/conf/oh-my-zsh-install.sh
 }
 
 function docker_conf {
     apt-get -y install apt-transport-https ca-certificates curl
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    add-apt-repository \
+    add-apt-repository -y \
         "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
         $(lsb_release -cs) \
         stable"
@@ -146,7 +163,8 @@ SYNOPSIS
     my-ubuntu-config.sh [OPTION]
 
 DESCRIPTION
-Default options are --apt --beautify --git --vim --tmux --sogou --typora --zsh
+Default options are --apt --beautify --git --vim --tmux --sogou --typora --zsh,
+before install sogoupinyin, check your fcitx environment.
 
     --apt           apt update
     --beautify      install theme
@@ -161,12 +179,8 @@ Default options are --apt --beautify --git --vim --tmux --sogou --typora --zsh
     --leetcode      install leetcode-cli
 
     --help, -h
-    -clean          clean download files
-EOF
-}
 
-function clean {
-    rm -r `ls $dir | grep -v "my-ubuntu-config.sh"`
+EOF
 }
 
 rootness
@@ -202,8 +216,6 @@ do
 
         --help) show_help ;;
         -h) show_help ;;
-
-        -clean) clean ;;
 
         --) shift
             break ;;
