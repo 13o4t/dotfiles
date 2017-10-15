@@ -13,11 +13,11 @@ Edit files.
 To rsync dotfiles.
 
 ```bash
-./bootstrap.sh
+source bootstrap.sh
 ```
 
 Alternatively, to install some software.
 
 ```bash
-./apt.sh
+source apt.sh
 ```

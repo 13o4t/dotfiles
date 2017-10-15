@@ -76,4 +76,5 @@ apt-get -y install docker-ce
 #apt-get -y install npm
 #npm install leetcode-cli -g
 
-echo "\nPlease reboot the computer and chose theme and icon in unity-tweak-tool."
+echo "\nPlease reboot the computer, then chose theme and icon in unity-tweak-tool,"
+echo "and run 'vim +PlugInstall' to install vim plug-in unit."
