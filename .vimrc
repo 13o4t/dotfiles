@@ -115,7 +115,7 @@ set hlsearch
 
 " Nerd Tree
 let NERDChristmasTree=0
-let NERDTreeWinSize=40
+let NERDTreeWinSize=30
 let NERDTreeChDirMode=2
 let NERDTreeIgnore=['\~$', '\.pyc$', '\.swp$']
 let NERDTreeShowBookmarks=1
